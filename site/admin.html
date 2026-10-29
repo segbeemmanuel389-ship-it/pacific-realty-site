@@ -15,7 +15,7 @@
   <div class="right"><span class="who" id="who"></span><a href="index.html" target="_blank" rel="noopener">View website</a><button class="btn ghost sm" id="out" type="button" hidden>Sign out</button></div>
 </header>
 
-<main class="wrapc" id="vOff" hidden><div class="note warn">The admin dashboard is not connected to a database yet. See SETUP.md, then reload this page.</div></main>
+<main class="wrapc" id="vOff" hidden><div class="note warn">Supabase is not configured for this deployment. The website owner must add SUPABASE_URL and SUPABASE_ANON_KEY under Workers Builds build variables, then redeploy.</div></main>
 
 <main class="wrapc" id="vLogin" hidden>
   <section class="box">
@@ -40,17 +40,46 @@
 
 <main class="wrapc wide" id="vApp" hidden>
   <div class="tabsA" role="tablist">
-    <button type="button" role="tab" data-tab="props" aria-selected="true">Properties</button>
+    <button type="button" role="tab" data-tab="dash" aria-selected="true">Dashboard</button>
+    <button type="button" role="tab" data-tab="props" aria-selected="false">Properties</button>
     <button type="button" role="tab" data-tab="enq" aria-selected="false">Enquiries <span id="enqBadge" class="chip" hidden></span></button>
     <button type="button" role="tab" data-tab="cli" aria-selected="false">Clients</button>
   </div>
 
-  <section id="tProps">
+  <section id="tDash" class="dash">
+    <h1>Dashboard</h1>
+    <p class="sub">A quick overview of your listings and enquiries.</p>
+    <div class="dashStats">
+      <article class="stat"><span>All properties</span><strong id="statProps">—</strong></article>
+      <article class="stat"><span>Available</span><strong id="statAvailable">—</strong></article>
+      <article class="stat"><span>New enquiries</span><strong id="statEnquiries">—</strong></article>
+      <article class="stat"><span>Clients</span><strong id="statClients">—</strong></article>
+    </div>
+    <div class="tool">
+      <button class="btn sm" type="button" data-goto="props">Manage properties</button>
+      <button class="btn sm ghost" type="button" data-goto="enq">View enquiries</button>
+      <button class="btn sm ghost" type="button" data-goto="cli">View clients</button>
+    </div>
+    <p id="dashMsg" class="msg" role="status" aria-live="polite">Loading your dashboard…</p>
+  </section>
+
+  <section id="tProps" hidden>
+    <h1>Properties</h1>
     <div class="tool">
       <button class="btn" id="add" type="button">+ Add property</button>
       <input type="search" id="search" placeholder="Search listings" aria-label="Search listings">
+      <select id="availabilityFilter" aria-label="Filter by availability">
+        <option value="">All availability</option><option value="available">Available</option><option value="unavailable">Unavailable</option>
+      </select>
+      <select id="featuredFilter" aria-label="Filter by featured status">
+        <option value="">All featured status</option><option value="featured">Featured</option><option value="regular">Not featured</option>
+      </select>
+      <select id="typeFilter" aria-label="Filter by property type">
+        <option value="">All property types</option><option value="residential">Residential</option><option value="commercial">Commercial</option><option value="land">Land</option>
+      </select>
       <span class="grow"></span><span id="pcount" class="sub" style="margin:0"></span>
     </div>
+    <p id="propsMsg" class="msg" role="status" aria-live="polite"></p>
     <div id="import" class="note" hidden>
       <b>Your database is empty.</b> The website is currently showing its built-in listings.
       <button class="btn sm" id="doImport" type="button" style="margin-left:8px">Import my current 15 listings</button>
@@ -60,10 +89,20 @@
   </section>
 
   <section id="tEnq" hidden>
+    <h1>Enquiries</h1>
+    <div class="tool">
+      <input type="search" id="enqSearch" placeholder="Search enquiries" aria-label="Search enquiries">
+      <select id="enqStatusFilter" aria-label="Filter enquiries by status">
+        <option value="">All statuses</option><option value="new">New</option><option value="contacted">Contacted</option><option value="closed">Closed</option>
+      </select>
+    </div>
+    <p id="enqMsg" class="msg" role="status" aria-live="polite"></p>
     <div id="elist"></div>
   </section>
 
   <section id="tCli" hidden>
+    <h1>Clients</h1>
+    <p id="clientMsg" class="msg" role="status" aria-live="polite">Loading clients…</p>
     <div class="scroll"><table class="tbl"><thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Joined</th></tr></thead><tbody id="clist"></tbody></table></div>
     <p id="cempty" class="sub" hidden>No client accounts yet.</p>
   </section>

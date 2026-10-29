@@ -35,15 +35,14 @@
   $('tIn').addEventListener('click', function () { tab(false); });
 
   if (!PRS.configured) {
-    // Show the forms so the page can be seen, but explain that sign-up is not switched on yet.
     $('notcfg').hidden = false; view('vAuth');
     ['fUp', 'fIn'].forEach(function (id) {
-      $(id).addEventListener('submit', function (e) { e.preventDefault(); say('msg', 'Accounts are not switched on yet. The website owner still needs to finish the database setup (see SETUP.md).', 'bad'); });
+      $(id).addEventListener('submit', function (e) { e.preventDefault(); say('msg', 'Supabase is not configured for this deployment. Please contact the website owner.', 'bad'); });
     });
     return;
   }
   PRS.client().then(init).catch(function (e) {
-    $('notcfg').hidden = false; $('notcfg').textContent = 'Could not connect: ' + e.message;
+    $('notcfg').hidden = false; $('notcfg').textContent = 'Could not connect to Supabase: ' + nice(e);
   });
 
   async function init(c) {
@@ -52,7 +51,7 @@
       if (ev === 'PASSWORD_RECOVERY') { view('vAuth'); $('fUp').hidden = true; $('fIn').hidden = true; $('fReset').hidden = false; say('msg', ''); return; }
       if (ev === 'SIGNED_OUT') { user = null; view('vAuth'); }
     });
-    var r = await sb.auth.getSession();
+    var r = await sb.auth.getSession(); if (r.error) throw r.error;
     if (r.data && r.data.session && $('fReset').hidden) await showMe(r.data.session.user); else if (!r.data.session) view('vAuth');
   }
 
@@ -129,12 +128,17 @@
     user = u; view('vMe'); say('meMsg', '');
     $('meEmail').textContent = u.email || '';
     var p = await sb.from('profiles').select('full_name,phone,email').eq('id', u.id).maybeSingle();
+    var errors = [];
+    if (p.error) errors.push('Could not load your profile: ' + nice(p.error));
     var prof = (p.data) || {};
     $('hi').textContent = 'Hello, ' + ((prof.full_name || (u.user_metadata && u.user_metadata.full_name) || 'there').split(' ')[0]);
     $('fMe').fn.value = prof.full_name || (u.user_metadata && u.user_metadata.full_name) || '';
     $('fMe').ph.value = prof.phone || '';
-    var o = await sb.rpc('is_owner'); $('adminBox').hidden = !(o && o.data === true);
-    loadSaved();
+    var o = await sb.rpc('is_owner');
+    $('adminBox').hidden = !(o && !o.error && o.data === true);
+    if (o.error) errors.push('Could not verify administrator access: ' + nice(o.error));
+    if (errors.length) say('meMsg', errors.join(' '), 'bad');
+    await loadSaved();
   }
 
   $('fMe').addEventListener('submit', async function (e) {
@@ -156,9 +160,11 @@
   async function loadSaved() {
     var ul = $('saved'); ul.innerHTML = '';
     var r = await sb.from('saved_properties').select('property_id').eq('user_id', user.id);
+    if (r.error) { say('meMsg', 'Could not load saved properties: ' + nice(r.error), 'bad'); return; }
     var ids = (r.data || []).map(function (x) { return x.property_id; });
     $('noSaved').hidden = ids.length > 0; if (!ids.length) return;
     var p = await sb.from('properties').select('id,title,price_label,location_detail').in('id', ids);
+    if (p.error) { say('meMsg', 'Could not load saved property details: ' + nice(p.error), 'bad'); return; }
     (p.data || []).forEach(function (x) {
       var li = document.createElement('li');
       li.innerHTML = '<span><b>' + esc(x.title) + '</b><br><small>' + esc(x.price_label || '') + ' · ' + esc(x.location_detail || '') + '</small></span><button class="lk" type="button" data-id="' + esc(x.id) + '">Remove</button>';
@@ -172,8 +178,13 @@
     if (!r.error) {
       try { var s = JSON.parse(localStorage.getItem('saved') || '[]').filter(function (k) { return k !== b.dataset.id; }); localStorage.setItem('saved', JSON.stringify(s)); } catch (x) {}
       loadSaved();
-    } else b.disabled = false;
+    } else { b.disabled = false; say('meMsg', 'Could not remove saved property: ' + nice(r.error), 'bad'); }
   });
 
-  $('out').addEventListener('click', async function () { await sb.auth.signOut(); user = null; view('vAuth'); tab(false); say('msg', 'You have signed out.', 'ok'); });
+  $('out').addEventListener('click', async function () {
+    try {
+      var r = await sb.auth.signOut(); if (r.error) throw r.error;
+      user = null; view('vAuth'); tab(false); say('msg', 'You have signed out.', 'ok');
+    } catch (err) { say('meMsg', nice(err), 'bad'); }
+  });
 })();

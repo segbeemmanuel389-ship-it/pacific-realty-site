@@ -1,3 +1,2 @@
-// Placeholder. On Netlify this file is regenerated from your environment variables
-// (see SETUP.md). For quick local testing you can paste your values here.
+// Placeholder. The build writes the environment-backed config here after validating all required variables.
 window.PRS_CONFIG = { SUPABASE_URL: "", SUPABASE_ANON_KEY: "", WHATSAPP_NUMBER: "" };
