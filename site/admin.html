@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Admin dashboard – Pacific Realty Solution Ltd</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/app.css">
+</head>
+<body>
+<header class="bar">
+  <a href="index.html" aria-label="Pacific Realty Solution Ltd, home"><img src="assets/logo.png" alt="Pacific Realty Solution Ltd"></a>
+  <div class="right"><span class="who" id="who"></span><a href="index.html" target="_blank" rel="noopener">View website</a><button class="btn ghost sm" id="out" type="button" hidden>Sign out</button></div>
+</header>
+
+<main class="wrapc" id="vOff" hidden><div class="note warn">The admin dashboard is not connected to a database yet. See SETUP.md, then reload this page.</div></main>
+
+<main class="wrapc" id="vLogin" hidden>
+  <section class="box">
+    <h1>Admin sign in</h1>
+    <p class="sub">For the website owner only.</p>
+    <form id="fLogin" novalidate>
+      <label>Email<input name="em" type="email" autocomplete="email" required><span class="err" data-for="em"></span></label>
+      <label>Password<input name="pw" type="password" autocomplete="current-password" required><span class="err" data-for="pw"></span></label>
+      <button class="btn" type="submit">Sign in</button>
+    </form>
+    <p id="lmsg" class="msg" role="status" aria-live="polite"></p>
+  </section>
+</main>
+
+<main class="wrapc" id="vDenied" hidden>
+  <section class="box">
+    <h1>No admin access</h1>
+    <p>The account <b id="deniedEmail"></b> is not an administrator, so it cannot change listings.</p>
+    <p><button class="btn ghost" id="deniedOut" type="button">Sign out</button> <a class="btn" href="account.html">Go to my account</a></p>
+  </section>
+</main>
+
+<main class="wrapc wide" id="vApp" hidden>
+  <div class="tabsA" role="tablist">
+    <button type="button" role="tab" data-tab="props" aria-selected="true">Properties</button>
+    <button type="button" role="tab" data-tab="enq" aria-selected="false">Enquiries <span id="enqBadge" class="chip" hidden></span></button>
+    <button type="button" role="tab" data-tab="cli" aria-selected="false">Clients</button>
+  </div>
+
+  <section id="tProps">
+    <div class="tool">
+      <button class="btn" id="add" type="button">+ Add property</button>
+      <input type="search" id="search" placeholder="Search listings" aria-label="Search listings">
+      <span class="grow"></span><span id="pcount" class="sub" style="margin:0"></span>
+    </div>
+    <div id="import" class="note" hidden>
+      <b>Your database is empty.</b> The website is currently showing its built-in listings.
+      <button class="btn sm" id="doImport" type="button" style="margin-left:8px">Import my current 15 listings</button>
+      <span id="importMsg" class="msg" style="display:block"></span>
+    </div>
+    <div id="plist"></div>
+  </section>
+
+  <section id="tEnq" hidden>
+    <div id="elist"></div>
+  </section>
+
+  <section id="tCli" hidden>
+    <div class="scroll"><table class="tbl"><thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Joined</th></tr></thead><tbody id="clist"></tbody></table></div>
+    <p id="cempty" class="sub" hidden>No client accounts yet.</p>
+  </section>
+</main>
+
+<dialog id="dlg" aria-labelledby="dlgT">
+  <div class="dbody">
+    <h2 id="dlgT">Add property</h2>
+    <form id="pf" novalidate style="margin-top:14px">
+      <label>Title<input name="title" maxlength="200" required><span class="err" data-for="title"></span></label>
+      <div class="cols2">
+        <label>Place (used by the search filter)<input name="area" maxlength="60" required placeholder="e.g. Orchid" list="areas"><span class="err" data-for="area"></span></label>
+        <label>Full location line<input name="location_detail" maxlength="160" placeholder="e.g. Orchid, Lekki, Lagos"></label>
+      </div>
+      <datalist id="areas"></datalist>
+      <div class="cols2">
+        <label>Price shown on the card<input name="price_label" maxlength="60" placeholder="e.g. ₦300,000,000 or From ₦199M"></label>
+        <label>Price in naira <small>(numbers only, optional)</small><input name="price_ngn" inputmode="numeric" placeholder="300000000"><span class="err" data-for="price_ngn"></span></label>
+      </div>
+      <div class="cols2">
+        <label>Type<select name="property_type"><option value="residential">Residential</option><option value="commercial">Commercial</option><option value="land">Land</option></select></label>
+        <label>Status<select name="listing_status"><option value="for_sale">For sale</option><option value="for_rent">For rent</option><option value="new_project">New project</option><option value="distress_sale">Distress sale</option><option value="ongoing_project">Ongoing project</option></select></label>
+      </div>
+      <div class="cols2">
+        <label>Bedrooms <small>(optional)</small><input name="bedrooms" inputmode="numeric" maxlength="2"><span class="err" data-for="bedrooms"></span></label>
+        <label>Bathrooms <small>(optional)</small><input name="bathrooms" inputmode="numeric" maxlength="2"><span class="err" data-for="bathrooms"></span></label>
+      </div>
+      <label>Highlights <small>(short tags shown on the card, separated by commas)</small><input name="features" placeholder="4 beds, BQ, C of O, Swimming pool"></label>
+      <label>Description <small>(start a line with "- " for a bullet; a line ending with ":" becomes a heading)</small><textarea name="description" rows="8"></textarea></label>
+      <div>
+        <label for="imgFile" style="margin-bottom:6px">Photos <small>(the first one is the cover; JPG, PNG or WebP)</small></label>
+        <input id="imgFile" type="file" accept="image/jpeg,image/png,image/webp" multiple>
+        <span class="err" id="imgErr"></span>
+        <ul class="imgs" id="imgs" style="margin-top:10px"></ul>
+      </div>
+      <div style="display:flex;gap:18px;flex-wrap:wrap">
+        <label class="sw"><input type="checkbox" name="is_available" checked> Available (shown on the website)</label>
+        <label class="sw"><input type="checkbox" name="is_featured"> Featured property</label>
+      </div>
+      <p id="pmsg" class="msg" role="status" aria-live="polite" style="margin:0"></p>
+      <div style="display:flex;gap:10px;justify-content:flex-end">
+        <button class="btn ghost" id="cancel" type="button">Cancel</button>
+        <button class="btn" id="save" type="submit">Save property</button>
+      </div>
+    </form>
+  </div>
+</dialog>
+
+<script src="config.js"></script>
+<script src="assets/sb.js"></script>
+<script src="assets/admin.js"></script>
+</body>
+</html>

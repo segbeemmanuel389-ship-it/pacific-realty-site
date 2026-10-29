@@ -1,0 +1,8 @@
+.env
+.env.*
+!.env.example
+.envy
+node_modules/
+dist/
+Thumbs.db
+.DS_Store

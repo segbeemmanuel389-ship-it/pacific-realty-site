@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Your account – Pacific Realty Solution Ltd</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/app.css">
+</head>
+<body>
+<header class="bar">
+  <a href="index.html" aria-label="Pacific Realty Solution Ltd, home"><img src="assets/logo.png" alt="Pacific Realty Solution Ltd"></a>
+  <a href="index.html">&larr; Back to website</a>
+</header>
+<main class="wrapc">
+  <div id="notcfg" class="note warn" hidden>Accounts are not switched on yet. The website owner needs to connect the database (see SETUP.md), then this page will work.</div>
+
+  <section id="vAuth" class="box" hidden>
+    <h1>Welcome</h1>
+    <p class="sub">Create a free account to save properties and keep your details for faster enquiries. You can also browse and enquire without one.</p>
+    <div class="tabs" role="tablist">
+      <button id="tUp" type="button" role="tab" aria-selected="true">Create account</button>
+      <button id="tIn" type="button" role="tab" aria-selected="false">Sign in</button>
+    </div>
+
+    <form id="fUp" novalidate>
+      <label>Full name<input name="fn" autocomplete="name" required maxlength="80"><span class="err" data-for="fn"></span></label>
+      <label>Email<input name="em" type="email" autocomplete="email" required maxlength="120"><span class="err" data-for="em"></span></label>
+      <label>Phone <small>(optional)</small><input name="ph" type="tel" autocomplete="tel" maxlength="20" placeholder="0801 234 5678"><span class="err" data-for="ph"></span></label>
+      <div class="cols2">
+        <label>Password<input name="pw" type="password" autocomplete="new-password" required minlength="8" maxlength="72"><span class="err" data-for="pw"></span></label>
+        <label>Confirm password<input name="pw2" type="password" autocomplete="new-password" required maxlength="72"><span class="err" data-for="pw2"></span></label>
+      </div>
+      <small class="sub" style="margin:-4px 0 0">At least 8 characters.</small>
+      <input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+      <button class="btn" type="submit">Create my account</button>
+    </form>
+
+    <form id="fIn" novalidate hidden>
+      <label>Email<input name="em" type="email" autocomplete="email" required><span class="err" data-for="em"></span></label>
+      <label>Password<input name="pw" type="password" autocomplete="current-password" required><span class="err" data-for="pw"></span></label>
+      <button class="btn" type="submit">Sign in</button>
+      <button class="lk" id="forgot" type="button" style="justify-self:start">Forgot your password?</button>
+    </form>
+
+    <form id="fReset" novalidate hidden>
+      <p class="sub">Choose a new password for your account.</p>
+      <label>New password<input name="pw" type="password" autocomplete="new-password" required minlength="8"><span class="err" data-for="pw"></span></label>
+      <button class="btn" type="submit">Save new password</button>
+    </form>
+    <p id="msg" class="msg" role="status" aria-live="polite"></p>
+  </section>
+
+  <section id="vMe" class="box" hidden>
+    <h1 id="hi">Your account</h1>
+    <p class="sub" id="meEmail"></p>
+    <div id="adminBox" class="note" hidden>You are an administrator. <a href="admin.html">Open the admin dashboard</a></div>
+    <form id="fMe" novalidate>
+      <label>Full name<input name="fn" maxlength="80" required><span class="err" data-for="fn"></span></label>
+      <label>Phone <small>(optional)</small><input name="ph" type="tel" maxlength="20"><span class="err" data-for="ph"></span></label>
+      <button class="btn" type="submit">Save details</button>
+    </form>
+    <p id="meMsg" class="msg" role="status" aria-live="polite"></p>
+    <h2 style="font-size:1.25rem;margin-top:26px">Saved properties</h2>
+    <ul id="saved" class="list"></ul>
+    <p id="noSaved" class="sub" hidden>You have not saved any properties yet. Tap the heart on a listing to save it.</p>
+    <p style="margin-top:24px"><button class="btn ghost" id="out" type="button">Sign out</button></p>
+  </section>
+</main>
+<script src="config.js"></script>
+<script src="assets/sb.js"></script>
+<script src="assets/account.js"></script>
+</body>
+</html>
