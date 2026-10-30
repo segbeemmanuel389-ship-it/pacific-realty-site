@@ -5,8 +5,16 @@
   PRS.cfg = cfg;
   PRS.configured = !!(cfg.SUPABASE_URL && cfg.SUPABASE_ANON_KEY);
   var LIB = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js';
+  function projectUrl() {
+    var url = new URL(cfg.SUPABASE_URL);
+    var path = url.pathname.replace(/\/+$/, '');
+    if ((path && path !== '/rest/v1') || url.search || url.hash) {
+      throw new Error('SUPABASE_URL must be the project URL, not an API endpoint.');
+    }
+    return url.origin;
+  }
   function make() {
-    return window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY, {
+    return window.supabase.createClient(projectUrl(), cfg.SUPABASE_ANON_KEY, {
       auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
     });
   }

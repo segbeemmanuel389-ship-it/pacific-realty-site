@@ -16,7 +16,7 @@ Under **Build variables and secrets** for the Worker build, add these exact name
 
 | Variable name | Value |
 |---|---|
-| `SUPABASE_URL` | Supabase project URL, for example `https://your-project-id.supabase.co` |
+| `SUPABASE_URL` | Supabase project URL only, for example `https://your-project-id.supabase.co` (not an API URL such as one ending in `/rest/v1`) |
 | `SUPABASE_ANON_KEY` | Supabase public anon/publishable key |
 | `WHATSAPP_NUMBER` | WhatsApp number including country code, digits only, such as `234...` |
 

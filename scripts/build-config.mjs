@@ -19,14 +19,17 @@ if (missing.length) {
   throw new Error(`Missing required build environment variable(s): ${missing.join(', ')}. No output was changed.`);
 }
 
-function isValidSupabaseUrl(value) {
+function normalizeSupabaseUrl(value) {
   try {
     const url = new URL(value);
-    return (url.protocol === 'https:' ||
+    const path = url.pathname.replace(/\/+$/, '');
+    const validProtocol = (url.protocol === 'https:' ||
       (url.protocol === 'http:' && ['localhost', '127.0.0.1'].includes(url.hostname))) &&
       !url.username && !url.password;
+    if (!validProtocol || (path && path !== '/rest/v1') || url.search || url.hash) return null;
+    return url.origin;
   } catch {
-    return false;
+    return null;
   }
 }
 
@@ -45,9 +48,11 @@ function isPublicAnonKey(value) {
   }
 }
 
-if (!isValidSupabaseUrl(cfg.SUPABASE_URL)) {
+const projectUrl = normalizeSupabaseUrl(cfg.SUPABASE_URL);
+if (!projectUrl) {
   throw new Error('SUPABASE_URL must be a valid HTTPS Supabase project URL (HTTP is allowed only for localhost). No output was changed.');
 }
+cfg.SUPABASE_URL = projectUrl;
 if (!isPublicAnonKey(cfg.SUPABASE_ANON_KEY)) {
   throw new Error('SUPABASE_ANON_KEY must be the public anon/publishable key. Secret and service_role keys are not allowed. No output was changed.');
 }
